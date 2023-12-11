@@ -89,11 +89,10 @@ while True:
     elif user_input == '3':
         print('Завершение работы')
         break  # Выходим из цикла
-
-    import os
-
+    
+import os
 # Задаем путь к директории, где хранятся файлы
-directory = 'C:\Users\as5\Desktop\rabota'
+directory = 'C:/Users/as5/Desktop/rabota'
 # Проверяем, существует ли директория
 if not os.path.exists(directory):
     # Если директория не существует, выдаем ошибку
@@ -106,20 +105,8 @@ else:
             continue
         else:
             # Иначе открываем файл и выполняем с ним некоторые действия
-            with open(os.path.join(directory, redactor), 'r') as file:
-                # Читаем содержимое файла
-                contents = file.read()
-                # Здесь выполняем некоторые действия с содержимым файла
-                print(f'Файл: {redactor}')
+            with open(os.path.join(directory, redactor), 'r+') as file:
+                f = open('redactor.py','r+')
+                print(f'Файл: {redactor}') #Для работы с файлом надо вести данную команду- ./Файл:redactor.py
 # Закрываем файл
 file.close()
-
-choice = int(input("Введите число от 1 до 3: "))
-if choice == 1:
-    print("Вы выбрали действие 1.")
-elif choice == 2:
-    print("Вы выбрали действие 2.")
-elif choice == 3:
-    print("Вы выбрали действие 3.")
-else:
-    print("Пожалуйста, введите число от 1 до 3.")
