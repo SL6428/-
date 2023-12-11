@@ -1,46 +1,125 @@
-import tkinter as tk
-from tkinter.filedialog import askopenfilename, asksaveasfilename
+import hashlib
+import os
 
-def open_file():
-    """Open a file for editing."""
-    filepath = askopenfilename(
-        filetypes=[("Text Files", "*.txt"), ("All Files", "*.*")]
-    )
-    if not filepath:
-        return
-    txt_edit.delete(1.0, tk.END)
-    with open(filepath, "r") as input_file:
-        text = input_file.read()
-        txt_edit.insert(tk.END, text)
-    window.title(f"Text Editor Application - {filepath}")
+def init_file():  # Инициализация файла, если этого не сделать програма вылетит м ошибкой, что файла нет
+    """Создает файл пользователей"""
+    if not os.path.exists('users.txt'):
+        with open('users.txt', 'w'):
+            pass
 
-def save_file():
-    """Save the current file as a new file."""
-    filepath = asksaveasfilename(
-        defaultextension="txt",
-        filetypes=[("Text Files", "*.txt"), ("All Files", "*.*")],
-    )
-    if not filepath:
-        return
-    with open(filepath, "w") as output_file:
-        text = txt_edit.get(1.0, tk.END)
-        output_file.write(text)
-    window.title(f"Text Editor Application - {filepath}")
 
-window = tk.Tk()
-window.title("Text Editor Application")
-window.rowconfigure(0, minsize=800, weight=1)
-window.columnconfigure(1, minsize=800, weight=1)
+def add_user(login: str, password: str) -> bool:
+    """Добавляет пользователя в файл"""
+    with open('users.txt', 'r') as f:
+        users = f.read().splitlines()  # Считываем всех пользователей из файла
 
-txt_edit = tk.Text(window)
-fr_buttons = tk.Frame(window, relief=tk.RAISED, bd=2)
-btn_open = tk.Button(fr_buttons, text="Open", command=open_file)
-btn_save = tk.Button(fr_buttons, text="Save As...", command=save_file)
+    for user in users:
+        args = user.split(':')
+        if login == args[0]:  # Если логин уже есть, парль не проверяем, шанс взлома увеличится(кто-то мб узнает пароль)
+            return False  # Тут можно написать что угодно, будь то HTML статус(409 - conflict), либо просто фразу ошибки
 
-btn_open.grid(row=0, column=0, sticky="ew", padx=5, pady=5)
-btn_save.grid(row=1, column=0, sticky="ew", padx=5)
+    with open('users.txt', 'a') as f:
+        f.write(f'{login}:{password}\n')  # Добавляем нового пользователя
+    return True
 
-fr_buttons.grid(row=0, column=0, sticky="ns")
-txt_edit.grid(row=0, column=1, sticky="nsew")
 
-window.mainloop()
+def get_user(login: str, password: str) -> bool:
+    """Проверяет логин и пароль пользователя"""
+    with open('users.txt', 'r') as f:
+        users = f.read().splitlines()  # Считываем всех пользователей из файла
+
+    for user in users:
+        args = user.split(':')
+        if login == args[0] and password == args[1]:  # Если пользователь с таким логином и паролем существует
+            return True
+    return False
+
+
+def main_loop(login: str):
+    """Главный цикл программы"""
+    print(f'Привет, {login}!')  # Тут основная часть программы
+
+
+init_file()
+
+while True:
+    print('''Добро пожаловать! Выберите пункт меню:
+    1. Вход
+    2. Регистрация
+    3. Выход''')
+
+    user_input = input()
+    if user_input == '1':  # Условия можно заменить на: user_input.lower() == 'вход'
+        print('Введите логин:')
+        login = input()
+
+        print('Введите пароль:')
+        password = input()
+
+        result = get_user(login, hashlib.sha256(password.encode()).hexdigest())
+
+        if result:
+            print('Вы вошли в систему')
+            break  # Выходим из цикла
+        else:
+            print('Неверный логин или пароль')
+
+    elif user_input == '2':
+        print('Введите логин:')
+        login = input()
+
+        print('Введите пароль:')
+        password = input()
+
+        print('Повторите пароль:')
+        password_repeat = input()
+
+        if password != password_repeat:
+            print('Пароли не совпадают!')
+            continue
+
+        result = add_user(login, hashlib.sha256(
+            password.encode()).hexdigest())  # Вызываем функцию добавления пользователя. И хешируем пароль(безопасность)
+
+        if not result:
+            print('Пользователь с таким логином уже существует')
+        else:
+            print('Регистрация прошла успешно!')
+
+    elif user_input == '3':
+        print('Завершение работы')
+        break  # Выходим из цикла
+
+    import os
+
+# Задаем путь к директории, где хранятся файлы
+directory = 'C:\Users\as5\Desktop\rabota'
+# Проверяем, существует ли директория
+if not os.path.exists(directory):
+    # Если директория не существует, выдаем ошибку
+    raise FileNotFoundError('Директория не найдена')
+else:
+    # Иначе перебираем все файлы в директории
+    for redactor in os.listdir(directory):
+        # Если файл является директорией, пропускаем его
+        if os.path.isdir(os.path.join(directory, redactor)):
+            continue
+        else:
+            # Иначе открываем файл и выполняем с ним некоторые действия
+            with open(os.path.join(directory, redactor), 'r') as file:
+                # Читаем содержимое файла
+                contents = file.read()
+                # Здесь выполняем некоторые действия с содержимым файла
+                print(f'Файл: {redactor}')
+# Закрываем файл
+file.close()
+
+choice = int(input("Введите число от 1 до 3: "))
+if choice == 1:
+    print("Вы выбрали действие 1.")
+elif choice == 2:
+    print("Вы выбрали действие 2.")
+elif choice == 3:
+    print("Вы выбрали действие 3.")
+else:
+    print("Пожалуйста, введите число от 1 до 3.")
