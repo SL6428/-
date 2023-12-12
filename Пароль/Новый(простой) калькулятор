@@ -1,0 +1,32 @@
+def add(x, y):
+    return x + y
+
+def subtract(x, y):
+    return x - y
+
+def multiply(x, y):
+    return x * y
+
+def divide(x, y):
+    if y == 0:
+        print("Деление на ноль невозможно")
+    else:
+        return x / y
+
+
+operation = input("Введите операцию (+, -, *, /): ")
+first_number = float(input("Введите первое число: "))
+second_number = float(input("Введите второе число: "))
+
+if operation == "+":
+    result = add(first_number, second_number)
+elif operation == "-":
+    result = subtract(first_number, second_number)
+elif operation == "*":
+    result = multiply(first_number, second_number)
+elif operation == "/":
+    result = divide(first_number, second_number)
+else:
+    print("Неизвестная операция")
+
+print(f"Результат: {result}")
